@@ -57,9 +57,8 @@ searchQueue, downloadQueue = queue.Queue(), queue.Queue()
 formatter = AnsiColorsFormater()
 formatter.enable_type()
 
-DEFAULT_FILE_TYPES = ['3g2']
-# DEFAULT_FILE_TYPES = ['3g2', '3gp', '3gp2', '3gpp', 'amv', 'asf', 'avi', 'bin', 'divx', 'drc', 'dv', 'f4v', 'flv',
-# 'gxf', 'iso', 'm1v', 'm4v', 'm2t', 'm2v', 'mov', 'mp2', 'mp2v', 'mpa']
+DEFAULT_FILE_TYPES = ['3g2', '3gp', '3gp2', '3gpp', 'amv', 'asf', 'avi', 'bin', 'divx', 'drc', 'dv', 'f4v', 'flv',
+                      'gxf', 'iso', 'm1v', 'm4v', 'm2t', 'm2v', 'mov', 'mp2', 'mp2v', 'mpa']
 DEFAULT_TIMEOUT = 60
 
 
@@ -79,7 +78,7 @@ class FileDownloader(object):
 
     def is_html_file(self, data):
         try:
-            return "<html" not in data
+            return "<html" not in data[:4]
         except TypeError as e:
             return False
 
@@ -273,8 +272,13 @@ def main():
     parser.add_argument("-d", "--debug", action="store_true")
     parser.add_argument("-s", "--searchByExtension", default=True, action="store_true")
     parser.add_argument("rootDirectory", type=str, help="root directory to store the downloaded resources")
-    parser.add_argument("--termFile", type=str, nargs=1, default=None, help="the exponent")
-    parser.add_argument("--timeout", type=int, nargs=1, default=DEFAULT_TIMEOUT, help="the exponent")
+    parser.add_argument("--termFile", type=str, nargs=1, default=None,
+                        help="the file containing the term collection to search for.")
+    parser.add_argument("--timeout", type=int, nargs=1, default=DEFAULT_TIMEOUT,
+                        help="timeout of the request done to archive.org")
+    parser.add_argument("--max_results", type=int, nargs=1, default=DEFAULT_MAX_RESULTS,
+                        help="Maximum results per file term")
+    parser.add_argument("--workers", type=int, nargs=1, default=DEFAULT_WORKER_QUANTITY, help="Worker threshold.")
     args = parser.parse_args()
 
     term_collection = DEFAULT_FILE_TYPES if args.termFile is None else get_term_collection(args.termFile)
